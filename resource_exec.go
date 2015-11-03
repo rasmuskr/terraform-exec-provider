@@ -38,12 +38,6 @@ func resourceExec() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
-			/*
-				"only_if": &schema.Schema{
-					Type:     schema.TypeString,
-					Optional: true,
-				},
-			*/
 			"destroy_command": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -52,10 +46,6 @@ func resourceExec() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			/*"output": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},*/
 		},
 	}
 }
@@ -68,31 +58,13 @@ func resourceExecCreate(d *schema.ResourceData, m interface{}) error {
 		Timeout: timeout,
 	}
 
-	/*
-	   onlyIf := &ExecCmd{
-	           Cmd:     d.Get("only_if").(string),
-	           Timeout: timeout,
-	   }
-
-	   // run the only_if command and continue only on success
-	   if onlyIf.Cmd != "" {
-	           _, err := ExecuteCmd(onlyIf)
-	           if err != nil {
-	                   log.Printf("[DEBUG] Skipped execution (%s): `%s` exited with a failed state", cmd.Cmd, onlyIf.Cmd)
-	                   // stop executing the command by returning nil
-	                   return nil
-	           }
-	   }
-	*/
 	// run the actual command
 	out, err := ExecuteCmd(cmd)
 	if err != nil {
-		// d.Set("output", "")
 		return nil
 	}
 	log.Printf("[DEBUG] Command Output (%s): %s", cmd.Cmd, out)
 
-	// d.Set("output", out)
 	// Set the id of the resource
 	d.SetId(GenerateSHA1(cmd.Cmd))
 	return nil
@@ -126,7 +98,6 @@ func resourceExecDelete(d *schema.ResourceData, m interface{}) error {
 		// run the actual command
 		out, err := ExecuteCmd(cmd)
 		if err != nil {
-			// d.Set("output", "")
 			return nil
 		}
 		log.Printf("[DEBUG] Command Output (%s): %s", cmd.Cmd, out)
