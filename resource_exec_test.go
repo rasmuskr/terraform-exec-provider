@@ -21,13 +21,12 @@ func init() {
 
 func TestResourceExecCreate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
-		Providers:    testAccProviders,
-		CheckDestroy: testAccResourceExecDestroy,
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			resource.TestStep{
 				Config: testAccResourceExecConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("exec.foo", "output", "success\n"),
+					resource.TestCheckResourceAttr("exec_exec.foo", "id", "5ffe533b830f08a0326348a9160afafc8ada44db"),
 				),
 			},
 		},
@@ -37,39 +36,18 @@ func TestResourceExecCreate(t *testing.T) {
 func TestResourceExecUpdate(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		Providers:    testAccProviders,
-		CheckDestroy: testAccResourceExecDestroy,
+		CheckDestroy: testAccCheckExecResourceIsNil("exec_exec.foo"),
 		Steps: []resource.TestStep{
 			resource.TestStep{
 				Config: testAccResourceExecConfig_basic,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("exec.foo", "output", "success\n"),
+					resource.TestCheckResourceAttr("exec_exec.foo", "id", "5ffe533b830f08a0326348a9160afafc8ada44db"),
 				),
 			},
 			resource.TestStep{
 				Config: testAccResourceExecConfig_basic_2,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("exec.foo", "output", "success2\n"),
-				),
-			},
-		},
-	})
-}
-
-func TestResourceExecCreateTestFail(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		Providers:    testAccProviders,
-		CheckDestroy: testAccResourceExecDestroy,
-		Steps: []resource.TestStep{
-			resource.TestStep{
-				Config: testAccResourceExecConfig_test_fail,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckExecResourceIsNil("exec.foo"),
-				),
-			},
-			resource.TestStep{
-				Config: testAccResourceExecConfig_test_pass,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("exec.foo", "output", "success\n"),
+					resource.TestCheckResourceAttr("exec_exec.foo", "id", "3b332e3e7ba175040ba3c0999d0fd115d2539edd"),
 				),
 			},
 		},
@@ -86,40 +64,28 @@ func testAccCheckExecResourceIsNil(r string) resource.TestCheckFunc {
 	}
 }
 
-func testAccResourceExecDestroy(s *terraform.State) error {
-	return nil
-}
-
 const testAccResourceExecConfig_basic = `
-resource "exec" "foo" {
-	command = "echo 'success'"
+resource "exec_exec" "foo" {
+  command = "true"
+  destroy_command = "false"
 }
 `
+
 const testAccResourceExecConfig_basic_2 = `
-resource "exec" "foo" {
-	command = "echo 'success2'"
+resource "exec_exec" "foo" {
+  command = "echo 'success2'"
+  destroy_command = "false"
 }
 `
-const testAccResourceExecConfig_test_pass = `
-resource "exec" "foo" {
-	command = "echo 'success'"
-	only_if = "true"
-}
-`
-const testAccResourceExecConfig_test_fail = `
-resource "exec" "foo" {
-	command = "echo 'success'"
-	only_if = "false"
-}
-`
+
 const testAccResourceExecConfig_timeout = `
-resource "exec" "foo" {
+resource "exec_exec" "foo" {
 	command = "sleep 2 && echo 'success'"
 	timeout = 1
 }
 `
 const testAccResourceExecConfig_fail = `
-resource "exec" "foo" {
+resource "exec_exec" "foo" {
 	command = "echo 'failure' >&2 && exit 1"
 }
 `

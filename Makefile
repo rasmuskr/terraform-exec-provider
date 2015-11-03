@@ -1,7 +1,7 @@
 PROGRAM = terraform-provider-exec
 
 test: build
-	TF_ACC=1 TF_LOG=1 go test -v ""
+	TF_ACC=1 go test -v ""
 
 updatedeps:
 	@go get -u golang.org/x/tools/cmd/stringer
